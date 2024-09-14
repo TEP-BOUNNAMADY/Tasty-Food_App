@@ -4,14 +4,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,6 +24,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.afinal.Food.SearchScreenUI
 
 @Composable
 fun MyFoodSoApp() {
@@ -40,21 +41,20 @@ fun MyFoodSoApp() {
         ) {
             composable("Home") { MainScreenUI(navController, viewModel) }
             composable("Search") { SearchScreenUI(navController, viewModel) }
-//            composable("Favorite") { FavoriteScreen(viewModel, navController) }
-//            composable("AboutUs") { AboutUsScreen() }
-//            composable("MealDetail/{mealName}") { backStackEntry ->
-//                val mealName = backStackEntry.arguments?.getString("mealName") ?: return@composable
-//                MealDetailScreen(mealName = mealName, navController, viewModel)
-//            }
         }
     }
 }
 
 @Composable
-fun BottomNavBar(nc: NavHostController) {
+fun BottomNavBar(navController: NavHostController) {
+    val customTextStyle = TextStyle(
+        fontFamily = FontFamily.Serif,
+        fontSize = 16.sp
+    )
+
     BottomNavigation(
-        backgroundColor = Color(0xFFDC3D74),
-        //contentColor = Color(0xFF00FF00) // Change the color here (e.g., green)
+        backgroundColor = MaterialTheme.colors.background,
+        contentColor = MaterialTheme.colors.onBackground
     ) {
         val items = listOf("Home", "Search", "Favorite", "AboutUs")
 
@@ -63,7 +63,6 @@ fun BottomNavBar(nc: NavHostController) {
                 icon = {
                     Icon(
                         imageVector = getIcon(screen),
-                        tint  = Color(0xFFFFFFFF), // Change the color here as well
                         contentDescription = null
                     )
                 },
@@ -71,18 +70,17 @@ fun BottomNavBar(nc: NavHostController) {
                     Text(
                         text = screen,
                         fontFamily = FontFamily.Serif,
-                        color = Color.White
+                        color = Color.Black
                     )
                 },
                 selected = false,
                 onClick = {
-                    nc.navigate(screen)
+                    navController.navigate(screen)
                 }
             )
         }
     }
 }
-
 
 @Composable
 fun getIcon(screen: String): ImageVector {

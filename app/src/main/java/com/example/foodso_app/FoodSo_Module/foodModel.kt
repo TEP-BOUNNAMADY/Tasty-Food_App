@@ -1,6 +1,6 @@
 package com.example.foodso_app.FoodSo_Module
-import com.google.gson.annotations.SerializedName
 
+import com.google.gson.annotations.SerializedName
 
 data class FavoriteMeal(
     val id: String,
@@ -9,14 +9,15 @@ data class FavoriteMeal(
     val area: String
 )
 
-
 data class MealsResponse(
     @SerializedName("meals")
     val meals: List<Meal>
 )
 
-
-
+data class MealDetailResponse(
+    @SerializedName("meals")
+    val meals: List<Meal>
+)
 
 data class Category(
     val idCategory: String,
@@ -25,13 +26,10 @@ data class Category(
     val strCategoryDescription: String
 )
 
-
 data class CategoriesResponse(
+    @SerializedName("categories")
     val categories: List<Category>
 )
-
-
-
 
 data class Meal(
     @SerializedName("idMeal")

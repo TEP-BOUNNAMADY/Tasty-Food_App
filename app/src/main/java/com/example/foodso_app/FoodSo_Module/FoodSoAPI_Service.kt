@@ -6,8 +6,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-
 const val Base_Url = "https://www.themealdb.com/api/json/v1/1/"
+
 interface TheFoodSoService {
     @GET("search.php?s=")
     suspend fun searchMeals(@Query("s") query: String): MealsResponse
@@ -21,6 +21,8 @@ interface TheFoodSoService {
     @GET("filter.php?a=")
     suspend fun searchMealsByArea(@Query("a") area: String): MealsResponse
 
+    @GET("lookup.php")
+    suspend fun getMealDetails(@Query("i") mealId: String): MealDetailResponse
 
     companion object {
         private var apiService: TheFoodSoService? = null
@@ -37,4 +39,3 @@ interface TheFoodSoService {
         }
     }
 }
-

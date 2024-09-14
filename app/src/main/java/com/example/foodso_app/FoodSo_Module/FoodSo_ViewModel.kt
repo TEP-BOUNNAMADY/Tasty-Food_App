@@ -1,8 +1,5 @@
 package com.example.foodso_app.FoodSo_Module
 
-import androidx.annotation.OptIn
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.Log
@@ -11,17 +8,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
-
 
 class TheFoodSoViewModel : ViewModel() {
     private val _results = MutableStateFlow<List<Meal>>(emptyList())
@@ -38,7 +26,6 @@ class TheFoodSoViewModel : ViewModel() {
 
     private val _areaMeals = MutableStateFlow<List<Meal>>(emptyList())
     val areaMeals: StateFlow<List<Meal>> = _areaMeals
-
 
     private val mealCache = mutableMapOf<String, Meal?>()
     private val categoryMealCache = mutableMapOf<String, List<Meal>>()
@@ -78,6 +65,7 @@ class TheFoodSoViewModel : ViewModel() {
         fetchCategories()
     }
 
+    @androidx.annotation.OptIn(UnstableApi::class)
     @OptIn(UnstableApi::class)
     fun toggleFavorite(meal: Meal) {
         val area = meal.strArea ?: "Unknown"
@@ -108,14 +96,12 @@ class TheFoodSoViewModel : ViewModel() {
         return _favoriteMeals.value.any { it.id == mealId }
     }
 
-
     @OptIn(UnstableApi::class)
     fun fetchMeals(query: String = "", category: String = "") {
         viewModelScope.launch {
             _isLoading.value = true
 
             try {
-
                 val cachedMeals = categoryMealCache[category]
                 if (cachedMeals != null) {
                     _results.value = cachedMeals
@@ -148,17 +134,14 @@ class TheFoodSoViewModel : ViewModel() {
         }
     }
 
+    @androidx.annotation.OptIn(UnstableApi::class)
     @OptIn(UnstableApi::class)
     private suspend fun fetchFullMealDetails(meal: Meal): Meal {
         return try {
-
-            val fullMealResponse = TheFoodSoService.getInstance().searchMeals(meal.strMeal)
-
+            val fullMealResponse = TheFoodSoService.getInstance().getMealDetails(meal.idMeal)
             val fullMeal = fullMealResponse.meals?.firstOrNull { it.idMeal == meal.idMeal }
-
             fullMeal ?: meal
         } catch (e: Exception) {
-
             Log.e("MealViewModel", "Error fetching full meal details: ${e.message}")
             meal
         }
@@ -181,6 +164,19 @@ class TheFoodSoViewModel : ViewModel() {
         }
     }
 
+    fun getMealDetails(mealId: String): StateFlow<Meal?> {
+        val mealFlow = MutableStateFlow<Meal?>(null)
+        viewModelScope.launch {
+            val cachedMeal = getCachedMealByName(mealId)
+            if (cachedMeal != null) {
+                mealFlow.value = cachedMeal
+            } else {
+                val fetchedMeal = fetchMealByName(mealId)
+                mealFlow.value = fetchedMeal
+            }
+        }
+        return mealFlow
+    }
 
     private fun fetchCategories() {
         viewModelScope.launch {
@@ -193,4 +189,3 @@ class TheFoodSoViewModel : ViewModel() {
         }
     }
 }
-
